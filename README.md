@@ -1,12 +1,5 @@
-## Micronaut 2.4.2 Documentation
+## WebRTC Signaling Server
 
-- [User Guide](https://docs.micronaut.io/2.4.2/guide/index.html)
-- [API Reference](https://docs.micronaut.io/2.4.2/api/index.html)
-- [Configuration Reference](https://docs.micronaut.io/2.4.2/guide/configurationreference.html)
-- [Micronaut Guides](https://guides.micronaut.io/index.html)
----
+Micronaut의 WebSocket을 이용하여 Signaling 작업 구축.
 
-## Feature http-client documentation
-
-- [Micronaut HTTP Client documentation](https://docs.micronaut.io/latest/guide/index.html#httpClient)
-
+TURN/STUN server 는 coturn 을 사용.
