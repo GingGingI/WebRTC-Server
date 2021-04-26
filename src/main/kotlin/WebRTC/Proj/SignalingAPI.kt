@@ -27,6 +27,8 @@ class SignalingAPI(private val broadcaster: WebSocketBroadcaster) {
     @OnOpen
     fun onOpen(channel: String, userid: String, session: WebSocketSession) {
         val msg = "[$userid] connected to [$channel]"
+//        채널확인
+        println(msg)
         broadcaster.broadcastSync(msg, isValid(channel, session))
     }
 
@@ -36,12 +38,14 @@ class SignalingAPI(private val broadcaster: WebSocketBroadcaster) {
         val msg = "[$userid] $message"
         println(msg)
 //        추후 메시지에 넘어온 데이터를 구분하여 시그널링 데이터 전송.
+
         broadcaster.broadcastSync(msg, isValid(channel, session))
     }
 
     @OnClose
     fun OnClose(channel: String, userid: String, session: WebSocketSession) {
         val msg = "[$userid] disconnected from [$channel]"
+//        채널에 사용자 확인 후 삭제
         broadcaster.broadcastSync(msg, isValid(channel, session))
     }
 
