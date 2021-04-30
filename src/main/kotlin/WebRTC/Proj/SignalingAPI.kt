@@ -8,6 +8,7 @@ import io.micronaut.websocket.annotation.OnOpen
 import io.micronaut.websocket.annotation.ServerWebSocket
 
 import java.util.function.Predicate
+import javax.inject.Singleton
 
 /**
  * TODO
@@ -24,12 +25,32 @@ class SignalingAPI(private val broadcaster: WebSocketBroadcaster) {
 //    user의 signaling을 할 시에
 //    ICE와 SDP정보를 담아 둘 데이터오브젝트도 제작해야 할 듯.
 
+//    channel Name: RoomMasterID
+    @Singleton
+    var channels: HashMap<String, String> = HashMap()
+
     @OnOpen
     fun onOpen(channel: String, userid: String, session: WebSocketSession) {
-        val msg = "[$userid] connected to [$channel]"
+        var msg: HashMap<String, Any> = HashMap()
+//        val msg = "[$userid] connected to [$channel]"
 //        채널확인
-        println(msg)
-        broadcaster.broadcastSync(msg, isValid(channel, session))
+//        println(msg)
+        println("socket open with Channel : [${channel}]")
+        val isChannelExist: Boolean = channels[channel]?.isNotEmpty() ?: false
+        if (!isChannelExist) {
+            println("channel Created")
+            msg.put("type", "created")
+            channels.put(channel, userid)
+
+            broadcaster.broadcastSync(msg, isValid(channel, session))
+            return
+        } else {
+            println("user jointed to ${channel}")
+            msg.put("type", "join")
+
+            broadcaster.broadcastSync(msg, inChannel(channel, session))
+        }
+//        broadcaster.broadcastSync(msg, isValid(channel, session))
     }
 
 //    session과 유저관리는 redis이용하여 빠르게 처리할 수 있도록.
@@ -53,6 +74,12 @@ class SignalingAPI(private val broadcaster: WebSocketBroadcaster) {
     private fun isValid(channel: String, session: WebSocketSession): Predicate<WebSocketSession> {
         return Predicate<WebSocketSession> {
             (it !== session && channel.equals(it.uriVariables.get("channel", String::class.java, null), ignoreCase = true))
+        }
+    }
+
+    private fun inChannel(channel: String, session: WebSocketSession): Predicate<WebSocketSession> {
+        return Predicate<WebSocketSession> {
+            (channel.equals(it.uriVariables.get("channel", String::class.java, null), ignoreCase = true))
         }
     }
 
