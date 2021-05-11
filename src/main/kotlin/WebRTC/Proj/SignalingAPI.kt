@@ -42,8 +42,7 @@ class SignalingAPI(private val broadcaster: WebSocketBroadcaster) {
             msg.put("type", "created")
             channels.put(channel, userid)
 
-            broadcaster.broadcastSync(msg, isValid(channel, session))
-            return
+            broadcaster.broadcastSync(msg, inChannel(channel, session))
         } else {
             println("user jointed to ${channel}")
             msg.put("type", "join")
@@ -54,12 +53,11 @@ class SignalingAPI(private val broadcaster: WebSocketBroadcaster) {
 //    session과 유저관리는 redis이용하여 빠르게 처리할 수 있도록.
     @OnMessage
     fun onMessage(channel: String, userid: String, message: String, session: WebSocketSession) {
-        val msg = "[$userid] $message"
-        println(msg)
+        val msg = "[$userid] ${message[1]}"
+        println("msg is : ${msg}")
 //        추후 메시지에 넘어온 데이터를 구분하여 시그널링 데이터 전송.
 
-
-        broadcaster.broadcastSync(msg, isValid(channel, session))
+        broadcaster.broadcastSync(message, isValid(channel, session))
     }
 
     @OnClose
